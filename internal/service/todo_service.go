@@ -20,3 +20,16 @@ func NewTodoService(repo *repository.TodoRepo) *TodoService{
 func (s *TodoService) GetTodos() ([]models.Todo, error){
 	return s.Repo.FindAll()
 }
+
+func (s *TodoService) CreateTodo(todo models.Todo) error{
+	return s.Repo.Create(todo)
+}
+
+
+func (s *TodoService) GetTodoById(id uint) (models.Todo, error){
+	return s.Repo.FindById(id)
+}
+
+func (s *TodoService) UpdateTodo(todo models.Todo) error{
+	return s.Repo.Update(todo)
+}

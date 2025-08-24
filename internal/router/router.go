@@ -10,7 +10,11 @@ import (
 func Setup(todoHandler *handler.TodoHandler) *gin.Engine{
 	r := gin.Default();
 
+	r.GET("/", todoHandler.Welcome)
 	r.GET("/todos", todoHandler.GetTodos)
+	r.POST("/todos", todoHandler.CreateTodo)
+	r.GET("/todos/:id", todoHandler.GetTodoById)
+	r.PUT("/todos/:id", todoHandler.UpdateTodo)
 
 
 	return r

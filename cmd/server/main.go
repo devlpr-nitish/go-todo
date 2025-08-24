@@ -22,7 +22,12 @@ func main(){
 	todoServices := service.NewTodoService(todoRepo)
 	todoHandler := handler.NewTodoHandler(todoServices)
 
-	r := router.Setup(todoHandler)
+
+	userRepo := repository.NewUserRepo(database)
+	userServices := service.NewUserService(userRepo)
+	userHandler := handler.NewUserHandler(userServices)
+
+	r := router.Setup(todoHandler, userHandler)
 
 	log.Printf("App running on :%s", cfg.Port)
 

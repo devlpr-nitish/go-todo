@@ -20,7 +20,7 @@ func Connect(cfg config.Config) *gorm.DB{
 	}
 
 	// Auto migrate table
-	if err := db.AutoMigrate(&models.Todo{}); err != nil{
+	if err := db.AutoMigrate(&models.User{}, &models.Todo{}); err != nil{
 		log.Fatal("failed to migrate database: ", err)
 	}
 

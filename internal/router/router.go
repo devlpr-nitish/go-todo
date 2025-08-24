@@ -15,6 +15,7 @@ func Setup(todoHandler *handler.TodoHandler) *gin.Engine{
 	r.POST("/todos", todoHandler.CreateTodo)
 	r.GET("/todos/:id", todoHandler.GetTodoById)
 	r.PUT("/todos/:id", todoHandler.UpdateTodo)
+	r.DELETE("/todos/:id", todoHandler.DeleteTodo)
 
 
 	return r

@@ -33,3 +33,7 @@ func (s *TodoService) GetTodoById(id uint) (models.Todo, error){
 func (s *TodoService) UpdateTodo(todo models.Todo) error{
 	return s.Repo.Update(todo)
 }
+
+func (s *TodoService) DeleteTodo(id uint) error{
+	return s.Repo.Delete(id)
+}

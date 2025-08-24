@@ -36,3 +36,7 @@ func (r *TodoRepo) FindById(id uint) (models.Todo, error){
 func (r *TodoRepo) Update(todo models.Todo) error{
 	return r.DB.Save(&todo).Error
 }
+
+func (r *TodoRepo) Delete(id uint) error{
+	return r.DB.Delete(&models.Todo{}, id).Error
+}

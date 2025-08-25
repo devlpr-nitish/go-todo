@@ -20,6 +20,7 @@ func Setup(todoHandler *handler.TodoHandler, userHandler *handler.UserHandler) *
 
 	// user routes
 	r.POST("/users/register", userHandler.Register)
+	r.POST("/users/login", userHandler.Login)
 
 
 	return r

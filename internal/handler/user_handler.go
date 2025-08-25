@@ -8,31 +8,45 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
-
-
-type UserHandler struct{
+type UserHandler struct {
 	Service *service.UserService
 }
 
-
-func NewUserHandler(s *service.UserService) *UserHandler{
-	return &UserHandler{Service: s,}
+func NewUserHandler(s *service.UserService) *UserHandler {
+	return &UserHandler{Service: s}
 }
 
-
-func (h *UserHandler) Register(c *gin.Context){
+func (h *UserHandler) Register(c *gin.Context) {
 	var user models.User
 
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error":"invalid request"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
 		return
 	}
 
 	if err := h.Service.Register(user); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error":"could not register user"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not register user"})
 		return
 	}
 
 	c.JSON(http.StatusOK, user)
+}
+
+func (h *UserHandler) Login(c *gin.Context) {
+
+	var req models.LoginReq
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		return
+	}
+
+	token, err := h.Service.Login(req)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"token": token})
 }

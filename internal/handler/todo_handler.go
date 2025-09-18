@@ -22,8 +22,20 @@ func NewTodoHandler(s *service.TodoService) *TodoHandler{
 	}
 }
 
+func (h *TodoHandler) Welcome(c *gin.Context){
+
+	c.JSON(http.StatusOK, gin.H{"message":"Hello welcome to the API"});
+}
+
 func (h *TodoHandler) GetTodos(c *gin.Context){
-	todos, err := h.Service.GetTodos()
+	userID, exists := c.Get("user_id")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error":"user not found"})
+		return
+	}
+
+	todos, err := h.Service.GetTodos(userID.(uint))
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error":"could not fetch todos"})
@@ -33,13 +45,22 @@ func (h *TodoHandler) GetTodos(c *gin.Context){
 }
 
 func (h *TodoHandler) CreateTodo(c *gin.Context){
+	userID, exists := c.Get("user_id")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error":"user not found"})
+		return
+	}
+
 	var todo models.Todo
 
 	err := c.ShouldBindJSON(&todo)
 	if err != nil{
-		c.JSON(http.StatusBadRequest, gin.H{"error":"invalid request"})
+		c.JSON(http.StatusBadRequest, gin.H{"error":"Please send the valid data"})
 		return
 	}
+
+	todo.UserID = userID.(uint)
 
 	if err := h.Service.CreateTodo(todo); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error":"could not create todo"})
@@ -54,10 +75,17 @@ func (h *TodoHandler) GetTodoById(c *gin.Context){
 
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	todo, err := h.Service.GetTodoById(uint(id))
+	userID, exists := c.Get("user_id")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error":"user not found"})
+		return
+	}
+
+	todo, err := h.Service.GetTodoById(uint(id), userID.(uint))
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error":"todo not found by this id"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error":"todo not found by id"})
 		return
 	}
 
@@ -65,25 +93,33 @@ func (h *TodoHandler) GetTodoById(c *gin.Context){
 }
 
 
-func (h *TodoHandler) Welcome(c *gin.Context){
 
-	c.JSON(http.StatusOK, gin.H{"message":"Hello welcome to the API"});
-}
 
 func (h *TodoHandler) UpdateTodo(c *gin.Context){
 	id, _ := strconv.Atoi(c.Param("id"))
+	userID, exists := c.Get("user_id")
 
-	todo , err := h.Service.GetTodoById(uint(id))
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error":"user not found"})
+		return
+	}
+
+	todo , err := h.Service.GetTodoById(uint(id), userID.(uint))
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error":"todo not found by this id"})
 		return
 	}
 
-	if err := c.ShouldBindJSON(&todo); err != nil{
+	var req models.Todo
+
+	if err := c.ShouldBindJSON(&req); err != nil{
 		c.JSON(http.StatusBadRequest, gin.H{"error":"invalid request"})
 		return
 	}
+
+	todo.Title = req.Title
+	todo.Completed = req.Completed
 
 	err = h.Service.UpdateTodo(todo)
 
@@ -99,14 +135,21 @@ func (h *TodoHandler) UpdateTodo(c *gin.Context){
 func (h *TodoHandler) DeleteTodo(c *gin.Context){
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	_ , err := h.Service.GetTodoById(uint(id))
+	userID, exists := c.Get("user_id")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error":"user not found"})
+		return
+	}
+
+	todo , err := h.Service.GetTodoById(uint(id), userID.(uint))
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error":"todo not found by this id"})
 		return
 	}
 
-	if err := h.Service.DeleteTodo(uint(id)); err != nil {
+	if err := h.Service.DeleteTodo(todo.ID, userID.(uint)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error":"could not delete todo"})
 		return
 	}

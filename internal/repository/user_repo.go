@@ -2,8 +2,6 @@ package repository
 
 import (
 	"fmt"
-	"log"
-
 	"github.com/devlpr-nitish/todo/internal/models"
 	"github.com/devlpr-nitish/todo/internal/utils"
 	"golang.org/x/crypto/bcrypt"
@@ -54,9 +52,7 @@ func (r *UserRepo) Login(req models.LoginReq) (string, error){
 		return "", err
 	}
 
-	log.Printf("User found: %+v", user)
-
-	if CheckPassword(req.Password, user.Password) {
+	if !CheckPassword(req.Password, user.Password) {
 		return "", fmt.Errorf("invalid email or password")
 	}
 

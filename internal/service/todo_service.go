@@ -17,8 +17,8 @@ func NewTodoService(repo *repository.TodoRepo) *TodoService{
 }
 
 
-func (s *TodoService) GetTodos() ([]models.Todo, error){
-	return s.Repo.FindAll()
+func (s *TodoService) GetTodos(userID uint) ([]models.Todo, error){
+	return s.Repo.FindByUserID(userID)
 }
 
 func (s *TodoService) CreateTodo(todo models.Todo) error{
@@ -26,14 +26,14 @@ func (s *TodoService) CreateTodo(todo models.Todo) error{
 }
 
 
-func (s *TodoService) GetTodoById(id uint) (models.Todo, error){
-	return s.Repo.FindById(id)
+func (s *TodoService) GetTodoById(id uint, userID uint) (models.Todo, error){
+	return s.Repo.FindByIdAndUser(id, userID)
 }
 
 func (s *TodoService) UpdateTodo(todo models.Todo) error{
 	return s.Repo.Update(todo)
 }
 
-func (s *TodoService) DeleteTodo(id uint) error{
-	return s.Repo.Delete(id)
+func (s *TodoService) DeleteTodo(id uint, userID uint) error{
+	return s.Repo.Delete(id, userID)
 }

@@ -17,9 +17,9 @@ func NewTodoRepo(db *gorm.DB) *TodoRepo{
 	}
 }
 
-func (r *TodoRepo) FindAll() ([]models.Todo, error){
+func (r *TodoRepo) FindByUserID(userID uint) ([]models.Todo, error){
 	var todos []models.Todo
-	result := r.DB.Find(&todos);
+	result := r.DB.Where("user_id = ? ", userID).Find(&todos);
 	return todos, result.Error
 }
 
@@ -27,9 +27,9 @@ func (r *TodoRepo) Create(todo models.Todo) error{
 	return r.DB.Create(&todo).Error
 }
 
-func (r *TodoRepo) FindById(id uint) (models.Todo, error){
+func (r *TodoRepo) FindByIdAndUser(id uint, userID uint) (models.Todo, error){
 	var todo models.Todo
-	result := r.DB.First(&todo, id)
+	result := r.DB.Where("id = ? AND user_id = ?", id, userID).First(&todo)
 	return todo, result.Error
 }
 
@@ -37,6 +37,6 @@ func (r *TodoRepo) Update(todo models.Todo) error{
 	return r.DB.Save(&todo).Error
 }
 
-func (r *TodoRepo) Delete(id uint) error{
-	return r.DB.Delete(&models.Todo{}, id).Error
+func (r *TodoRepo) Delete(id uint, userID uint) error{
+	return r.DB.Where("id = ? AND user_id = ?", id, userID).Delete(&models.Todo{}).Error
 }

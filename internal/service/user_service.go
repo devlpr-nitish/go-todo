@@ -20,7 +20,7 @@ func NewUserService(repo *repository.UserRepo) *UserService{
 func (s *UserService) Register(user models.User) error{
 
 	// hash password
-	hashedPassword , err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
+	hashedPassword , err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil{
 		return err
 	}
